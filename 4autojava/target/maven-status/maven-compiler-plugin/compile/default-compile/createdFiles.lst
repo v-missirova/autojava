@@ -1,0 +1,4 @@
+annotations\JsonKey.class
+annotations\JsonProcessor.class
+annotations\JsonSerializer.class
+annotations\GenerateJson.class
