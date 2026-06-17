@@ -1,0 +1,66 @@
+name: Java CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-test-package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: get code from repository
+        uses: actions/checkout@v4
+
+      - name: setup java 8
+        uses: actions/setup-java@v4
+        with:
+          java-version: '8'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: 1. Checkstyle
+        run: mvn checkstyle:check
+
+      - name: 2. Autotesting
+        run: mvn test
+
+      - name: 3. Build JAR
+        run: mvn package -DskipTests
+
+      - name: Save JAR afs artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: application-jar
+          path: target/*.jar
+
+  deploy-docker-image:
+    needs: build-test-package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: getting code
+        uses: actions/checkout@v4
+
+      - name: loading built jar artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: application-jar
+          path: target/
+
+      - name: 4a. authorisation in github container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 4b. create and publish docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/${{ github.repository }}/my-java8-app:latest

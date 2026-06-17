@@ -58,6 +58,42 @@
                 <version>11.0.20</version>
             </plugin>
 
+            <plugin>
+                <groupId>org.example</groupId>
+                <artifactId>garbage-creator-maven-plugin</artifactId>
+                <version>1.0-SNAPSHOT</version>
+                <configuration>
+                    <classCount>13</classCount>
+                    <packageName>garbage3</packageName>
+                    <classPrefix>MegaUsefulClass</classPrefix>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate_garbage</goal> </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <configLocation>sun_checks.xml</configLocation>
+                    <consoleOutput>true</consoleOutput>
+                    <failsOnError>true</failsOnError>
+                    <violationSeverity>warning</violationSeverity>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>
